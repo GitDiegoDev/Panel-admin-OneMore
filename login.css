@@ -1,0 +1,35 @@
+/* Login loader styles */
+.login-loader {
+    position: absolute;
+    inset: 0; /* top/right/bottom/left 0 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 16px;
+    z-index: 30;
+}
+
+.login-loader .spinner {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 6px solid rgba(0,0,0,0.08);
+    border-top-color: var(--primary, #ff6b35);
+    animation: spin 0.85s linear infinite;
+}
+
+.login-loader .loader-text {
+    font-weight: 700;
+    color: #333;
+    font-size: 14px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Ensure the loader is positioned inside the login-box */
+.login-box { position: relative; }

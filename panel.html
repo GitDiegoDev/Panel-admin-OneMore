@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel - One More</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        const API_BASE = "http://localhost:8000/api";
+        window.API_BASE = API_BASE;
+    </script>
+</head>
+<body>
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-utensils"></i>
+            <h2>One More</h2>
+        </div>
+        
+        <nav>
+            <a href="#" class="nav-item active" onclick="showSection('dashboard'); return false;">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('products'); return false;">
+                <i class="fas fa-box"></i>
+                <span>Productos</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('promos'); return false;">
+                <i class="fas fa-tags"></i>
+                <span>Promociones</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('categories'); return false;">
+                <i class="fas fa-chart-bar"></i>
+                <span>Categorías</span>
+            </a>
+        </nav>
+        
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <a href="#" id="username" onclick="showSection('config'); return false;">Administrador</a>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1 id="section-title">Dashboard</h1>
+            <div class="header-info">
+                <div id="current-date"></div>
+                <button class="refresh-btn" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Actualizar</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- SECCIONES (dashboard.js busca #dashboard-section) -->
+        <section id="dashboard-section" class="section-content">
+            <div class="section-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Resumen General</h2>
+            </div>
+            
+            <!-- KPIs (dashboard.js busca estos IDs) -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="kpi-content">
+                        <h3>Ventas Totales</h3>
+                        <div class="kpi-value" id="sales-today">$0</div>
+                        <div class="kpi-trend" id="sales-trend">0% vs ayer</div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-shopping-bag"></i></div>
+                    <div class="kpi-content">
+                        <h3>Pedidos</h3>
+                        <div class="kpi-value" id="orders-today">0</div>
+                        <div class="kpi-trend" id="orders-trend">0% vs ayer</div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="kpi-content">
+                        <h3>Hora Pico</h3>
+                        <div class="kpi-value" id="peak-hour">--:--</div>
+                        <div class="kpi-sub" id="peak-orders">0 pedidos</div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-star"></i></div>
+                    <div class="kpi-content">
+                        <h3>Producto Popular</h3>
+                        <div class="kpi-value" id="top-product">-</div>
+                        <div class="kpi-sub" id="top-sales">0 ventas</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- GRÁFICOS (dashboard.js busca estos IDs) -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-bar"></i> Ventas por Hora</h3>
+                    <canvas id="salesByHourChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-pie"></i> Productos Más Vendidos</h3>
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+                <div class="chart-card full-width">
+                    <h3><i class="fas fa-chart-line"></i> Ventas Semanales</h3>
+                    <canvas id="weeklySalesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN CONFIGURACIÓN -->
+        <section id="config-section" class="section-content hidden">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> Configuración</h2>
+            </div>
+
+            <div class="config-grid">
+                <div class="config-card">
+                    <h3>Horario de Atención</h3>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                        <label>Abre:</label>
+                        <input type="time" id="config-open-time">
+                        <label>Cierra:</label>
+                        <input type="time" id="config-close-time">
+                    </div>
+
+                    <h4>Días habilitados</h4>
+                    <div id="config-days" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                        <label class="checkbox-label"><input type="checkbox" value="0">Dom</label>
+                        <label class="checkbox-label"><input type="checkbox" value="1">Lun</label>
+                        <label class="checkbox-label"><input type="checkbox" value="2">Mar</label>
+                        <label class="checkbox-label"><input type="checkbox" value="3">Mié</label>
+                        <label class="checkbox-label"><input type="checkbox" value="4">Jue</label>
+                        <label class="checkbox-label"><input type="checkbox" value="5">Vie</label>
+                        <label class="checkbox-label"><input type="checkbox" value="6">Sáb</label>
+                    </div>
+
+                    <h4>Fechas cerradas (YYYY-MM-DD)</h4>
+                    <textarea id="config-closed-dates" placeholder="2025-12-25,2026-01-01" rows="2" style="width:100%;"></textarea>
+
+                    <div class="modal-actions" style="margin-top:12px;">
+                        <button class="cancel-btn" onclick="loadSiteConfig();">Cancelar</button>
+                        <button class="save-btn" id="save-config-btn">Guardar</button>
+                    </div>
+                </div>
+                <div class="config-card">
+                    <h3>Vista pública</h3>
+                    <p>Los clientes verán el horario y los días cerrados en el menú público.</p>
+                    <div style="margin-top:12px;">
+                        <button class="add-btn" onclick="loadSiteConfig();">Recargar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN PRODUCTOS (productos.js busca #products-section) -->
+        <section id="products-section" class="section-content hidden">
+            <div class="section-header">
+                <h2><i class="fas fa-box"></i> Productos</h2>
+                <button class="add-btn" onclick="openAddModal()">
+                    <i class="fas fa-plus"></i> Agregar Producto
+                </button>
+            </div>
+            
+            <!-- productos.js renderiza aquí -->
+            <div id="products-container"></div>
+        </section>
+
+        <!-- SECCIÓN PROMOCIONES (promos.js busca #promos-section) -->
+        <section id="promos-section" class="section-content hidden">
+            <div class="section-header">
+                <h2><i class="fas fa-tags"></i> Promociones</h2>
+                <button class="add-btn" onclick="openAddPromoModal()">
+                    <i class="fas fa-plus"></i> Nueva Promoción
+                </button>
+            </div>
+            
+            <!-- Estadísticas (promos.js busca estos IDs) -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <h3>Total Promociones</h3>
+                        <p class="stat-number" id="total-promos">0</p>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-tags"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <h3>Promociones Activas</h3>
+                        <p class="stat-number" id="active-promos">0</p>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <h3>Promociones Inactivas</h3>
+                        <p class="stat-number" id="inactive-promos">0</p>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-pause"></i></div>
+                </div>
+            </div>
+            
+            <!-- Tabla (promos.js busca #promos-table-body) -->
+            <div class="table-container">
+                <table id="promos-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Día</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promos-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECCIÓN categorias -->
+        <section id="categories-section" class="section-content hidden">
+            <div class="section-header">
+                <h2><i class="fas fa-tags"></i> Categorías</h2>
+                <button class="add-btn" onclick="openCategoryModal()"><i class="fas fa-plus"></i> Agregar</button>
+            </div>
+            <div class="category-form">
+                <input type="text" id="categoryNameInput" placeholder="Nueva categoría (rápida)">
+                <button onclick="quickAddCategory()">Agregar Rápido</button>
+            </div>
+            <ul id="categoriesList" class="category-list"></ul>
+        </section>
+    </div>
+
+    <!-- MODAL PRODUCTO (productos.js busca #product-modal) -->
+    <div id="product-modal" class="modal hidden">
+        <div class="modal-box">
+            <h3 id="modal-title">Nuevo Producto</h3>
+            
+            <input type="text" id="prod-name" placeholder="Nombre">
+            <input type="number" id="prod-price" placeholder="Precio" step="0.01">
+            <textarea id="prod-desc" placeholder="Descripción" rows="3"></textarea>
+            
+            <select id="prod-cat">
+                <option value="">Seleccionar categoría</option>
+            </select>
+            
+            <!-- Variantes (IDs que usa productos.js) -->
+            <div class="variants-section">
+                <label class="checkbox-label" style="margin: 15px 0;">
+                    <input type="checkbox" id="hasVariants">
+                    <span>Este producto tiene variantes</span>
+                </label>
+                
+                    <div id="variantsContainer" style="display: none; margin: 15px 0;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                        <input type="text" id="variantNameInput" placeholder="Nombre de la variante" style="flex: 1;">
+                        <input type="text" id="variantDescInput" placeholder="Descripción (opcional)" style="flex: 1;">
+                        <button type="button" id="addVariantBtn" class="add-variant-btn">Agregar</button>
+                    </div>
+                    <ul id="variantsList" style="list-style: none; padding: 0;"></ul>
+                </div>
+            </div>
+            
+            <label class="checkbox-label" style="margin: 15px 0;">
+                <input type="checkbox" id="prod-visible" checked>
+                <span>Visible en el menú</span>
+            </label>
+            
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeModal()">Cancelar</button>
+                <button class="save-btn" onclick="saveProduct()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PROMOCIÓN (promos.js busca #promo-modal) -->
+    <div id="promo-modal" class="modal hidden">
+        <div class="modal-box">
+            <h3 id="promo-modal-title">Nueva Promoción</h3>
+            
+            <input type="text" id="promo-name" placeholder="Título">
+            <textarea id="promo-description" placeholder="Descripción" rows="2"></textarea>
+            <input type="number" id="promo-price" placeholder="Precio" step="0.01">
+            
+            <select id="promo-day">
+                <option value="">Seleccionar día</option>
+                <option value="0">Domingo</option>
+                <option value="1">Lunes</option>
+                <option value="2">Martes</option>
+                <option value="3">Miércoles</option>
+                <option value="4">Jueves</option>
+                <option value="5">Viernes</option>
+                <option value="6">Sábado</option>
+            </select>
+            
+            <label class="checkbox-label" style="margin: 15px 0;">
+                <input type="checkbox" id="promo-active" checked>
+                <span>Promoción activa</span>
+            </label>
+            
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closePromoModal()">Cancelar</button>
+                <button class="save-btn" onclick="savePromo()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ELIMINAR PROMO (promos.js busca #delete-promo-modal) -->
+    <div id="delete-promo-modal" class="modal hidden">
+        <div class="modal-box">
+            <h3>Confirmar Eliminación</h3>
+            <p>¿Eliminar promoción "<span id="promo-to-delete-name"></span>"?</p>
+            
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeDeletePromoModal()">Cancelar</button>
+                <button class="delete-btn" onclick="confirmDeletePromo()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ELIMINAR PRODUCTO -->
+    <div id="delete-product-modal" class="modal hidden">
+        <div class="modal-box">
+            <h3>Confirmar Eliminación</h3>
+            <p>¿Eliminar producto "<span id="product-to-delete-name"></span>"?</p>
+
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeDeleteProductModal()">Cancelar</button>
+                <button class="delete-btn" onclick="confirmDeleteProduct()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ELIMINAR CATEGORÍA -->
+    <div id="delete-category-modal" class="modal hidden">
+        <div class="modal-box">
+            <h3>Confirmar Eliminación</h3>
+            <p>¿Eliminar categoría "<span id="category-to-delete-name"></span>"?</p>
+
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeDeleteCategoryModal()">Cancelar</button>
+                <button class="delete-btn" onclick="confirmDeleteCategory()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CATEGORÍA (dashboard.js busca #categoryModal) -->
+    <div id="categoryModal" class="modal hidden">
+        <div class="modal-box">
+            <h3>Nueva Categoría</h3>
+            <input type="text" id="new-category-name" placeholder="Nombre">
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeCategoryModal()">Cancelar</button>
+                <button class="save-btn" onclick="saveCategory()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARGAR SCRIPTS (ORDEN EXACTO como funcionan) -->
+    <script src="auth.js"></script>
+    <!-- Chart.js necesita cargarse antes de dashboard.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="productos.js"></script>
+    <script src="promos.js"></script>
+</body>
+</html>

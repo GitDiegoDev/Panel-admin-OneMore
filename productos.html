@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Productos</title>
+    <link rel="stylesheet" href="panel.css">
+</head>
+<body onload="checkAuth(); loadCategories(); loadProducts();">
+
+<header>
+    <h1>Productos</h1>
+    <button onclick="window.location.href='panel.html'">Volver</button>
+</header>
+
+<section class="content">
+    <button class="add-btn" onclick="openAddModal()">➕ Agregar Producto</button>
+
+    <!-- Secciones dinámicas -->
+    <div id="products-container"></div>
+</section>
+
+<!-- MODAL -->
+<div id="modal" class="modal hidden">
+    <div class="modal-box">
+        <h2 id="modal-title">Nuevo Producto</h2>
+
+        <input type="text" id="prod-name" placeholder="Nombre">
+        <input type="number" id="prod-price" placeholder="Precio">
+        <textarea id="prod-desc" placeholder="Descripción" rows="3"></textarea>
+
+        <select id="prod-cat">
+            <option value="">Cargando categorías...</option>
+        </select>
+
+        <label class="visible-check">
+            <input type="checkbox" id="prod-visible">
+            Visible en el menú
+        </label>
+
+        <div class="modal-actions">
+            <button onclick="saveProduct()">Guardar</button>
+            <button class="cancel" onclick="closeModal()">Cancelar</button>
+        </div>
+    </div>
+
+</div>
+<!--MODAL DE EDITAR-->
+
+<div id="modal" class="modal hidden">
+    <div class="modal-content">
+        <h2 id="modal-title"></h2>
+
+        <label>Nombre</label>
+        <input id="prod-name" type="text">
+
+        <label>Precio</label>
+        <input id="prod-price" type="number">
+
+        <label>Descripción</label>
+        <textarea id="prod-desc"></textarea>
+
+        <label>Categoría</label>
+        <select id="prod-cat"></select>
+
+        <label>
+            <input id="prod-visible" type="checkbox"> Visible
+        </label>
+
+        <button id="btn-save">Guardar</button>
+        <button onclick="closeModal()">Cancelar</button>
+    </div>
+</div>
+
+
+
+<script src="auth.js"></script>
+<script src="productos.js"></script>
+</body>
+</html>
