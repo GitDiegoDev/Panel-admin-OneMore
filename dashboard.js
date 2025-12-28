@@ -225,11 +225,11 @@ async function saveSiteConfig() {
     const closedDates = document.getElementById('config-closed-dates');
 
     const payload = {
-        open_time: openInput && openInput.value ? openInput.value : null,
-        close_time: closeInput && closeInput.value ? closeInput.value : null,
-        open_days: [],
-        closed_dates: []
-    };
+    open_time: openInput && openInput.value ? openInput.value : null,
+    close_time: closeInput && closeInput.value ? closeInput.value : null,
+    open_days: [],
+    closed_dates: []
+};
 
     if (daysContainer) {
         daysContainer.querySelectorAll('input[type="checkbox"]:checked')
