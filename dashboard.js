@@ -244,14 +244,14 @@ async function saveSiteConfig() {
     }
 
     try {
-        const res = await fetch(`${window.API_BASE}/site-config`, {
-            method: 'POST',
-            headers: {
-                ...getAuthHeaders(),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
+         const res = await fetch(`${window.API_BASE}/site-config`, {
+    method: 'POST',
+    headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+});
 
         if (!res.ok) {
             const err = await res.json();
