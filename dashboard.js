@@ -225,45 +225,52 @@ async function saveSiteConfig() {
     const closedDates = document.getElementById('config-closed-dates');
 
     const payload = {
-        open_time: openInput ? openInput.value : '',
-        close_time: closeInput ? closeInput.value : '',
+        open_time: openInput && openInput.value ? openInput.value : null,
+        close_time: closeInput && closeInput.value ? closeInput.value : null,
         open_days: [],
         closed_dates: []
     };
 
     if (daysContainer) {
-        daysContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-            if (cb.checked) payload.open_days.push(parseInt(cb.value));
-        });
+        daysContainer.querySelectorAll('input[type="checkbox"]:checked')
+            .forEach(cb => payload.open_days.push(Number(cb.value)));
     }
 
     if (closedDates && closedDates.value.trim()) {
-        payload.closed_dates = closedDates.value.split(',').map(s => s.trim()).filter(Boolean);
+        payload.closed_dates = closedDates.value
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
     }
 
     try {
-        // Try to POST to backend if endpoint exists
         const res = await fetch(`${window.API_BASE}/site-config`, {
             method: 'POST',
-            headers: getAuthHeaders(),
+            headers: {
+                ...getAuthHeaders(),
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(payload)
         });
 
-        if (res.ok) {
-            showNotification('Configuración guardada', 'success');
-        } else {
-            // Save locally as fallback
-            localStorage.setItem('site_config', JSON.stringify(payload));
-            showNotification('Configuración guardada localmente (API no disponible)', 'warning');
+        if (!res.ok) {
+            const err = await res.json();
+            throw err;
         }
+
+        showNotification('Configuración guardada correctamente', 'success');
+
     } catch (e) {
+        console.error('Error guardando site-config:', e);
         localStorage.setItem('site_config', JSON.stringify(payload));
-        showNotification('Configuración guardada localmente (error de conexión)', 'warning');
+        showNotification('Configuración guardada localmente (error de API)', 'warning');
     }
 
-    // Update public menu immediately
-    if (typeof fetchAndRenderSiteConfig === 'function') fetchAndRenderSiteConfig();
+    if (typeof fetchAndRenderSiteConfig === 'function') {
+        fetchAndRenderSiteConfig();
+    }
 }
+
 
 // ================= DASHBOARD DATA =================
 async function loadDashboardData() {
