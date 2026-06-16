@@ -115,7 +115,8 @@ function showSection(sectionId) {
         products: 'Gestión de Productos',
         promos: 'Promociones',
         reports: 'Reportes',
-        categories: 'Categorías'
+        categories: 'Categorías',
+        club: '🍔 Club One More'
     };
 
     const titleEl = document.getElementById('section-title');
@@ -163,6 +164,13 @@ function showSection(sectionId) {
         case 'config':
             // render and load configuration
             loadSiteConfig();
+            break;
+        case 'club':
+            if (typeof loadCustomers === 'function') {
+                loadCustomers();
+            } else {
+                console.error('club.js no está cargado');
+            }
             break;
     }
 }
