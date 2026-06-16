@@ -2004,3 +2004,84 @@ header h1 {
     }
 }
 
+
+/* CLUB ONE MORE STYLES */
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0 15px;
+    width: 300px;
+}
+
+.search-container i {
+    color: #6c757d;
+    margin-right: 10px;
+}
+
+.search-container input {
+    border: none;
+    padding: 10px 0;
+    width: 100%;
+    outline: none;
+    font-size: 14px;
+}
+
+.stamp-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stamp-visual {
+    font-size: 18px;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.stamp-count {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.customer-info-display p {
+    margin: 5px 0;
+    font-size: 15px;
+    color: var(--secondary);
+}
+
+.customer-info-display span {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+#club-table td {
+    vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+    .search-container {
+        width: 100%;
+        margin-top: 10px;
+    }
+}
+
+/* Adjustments for Club Table */
+#club-table th, #club-table td {
+    padding: 12px 15px;
+}
+
+#club-table .edit-btn {
+    width: auto;
+    height: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+#club-table .stamp-visual {
+    margin-bottom: 4px;
+}
