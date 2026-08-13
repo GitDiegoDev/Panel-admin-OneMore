@@ -2006,6 +2006,38 @@ header h1 {
 
 
 /* CLUB ONE MORE STYLES */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #27ae60, #219653);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 4px 10px rgba(39, 174, 96, 0.15);
+}
+
+.export-btn:hover {
+    background: linear-gradient(135deg, #219653, #1e8449);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(39, 174, 96, 0.25);
+}
+
+.export-btn:active {
+    transform: translateY(0);
+}
+
 .search-container {
     position: relative;
     display: flex;
@@ -2064,6 +2096,18 @@ header h1 {
 }
 
 @media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .export-btn {
+        justify-content: center;
+        width: 100%;
+    }
+
     .search-container {
         width: 100%;
         margin-top: 10px;
