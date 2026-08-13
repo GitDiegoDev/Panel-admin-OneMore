@@ -178,19 +178,26 @@ function exportCustomersToExcel() {
     try {
         // Excel/CSV compatible structure: UTF-8 BOM, separator (semi-colon/comma), headers
         const headers = ["Nombre", "Teléfono"];
-        const rows = allCustomers.map(customer => [
-            customer.nombre || "",
-            customer.telefono || ""
-        ]);
+        const rows = allCustomers.map(customer => {
+            const nombre = customer.nombre || "";
+            let telefono = customer.telefono || "";
+            if (telefono) {
+                // Envolver el teléfono como fórmula de texto para Excel para conservar ceros a la izquierda y caracteres especiales
+                if (!telefono.startsWith('="')) {
+                    telefono = `="${telefono}"`;
+                }
+            }
+            return [nombre, telefono];
+        });
 
         // Convert rows to CSV, escaping quotes and using semicolon separator
         const csvContent = [headers, ...rows]
             .map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(";"))
-            .join("\n");
+            .join("\r\n");
 
-        // UTF-8 BOM to ensure characters (such as accents or ñ) display correctly in Excel
-        const BOM = "\uFEFF";
-        const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+        // UTF-8 BOM representation using Uint8Array to ensure characters (such as accents or ñ) display correctly in Excel
+        const BOM = new Uint8Array([0xEF, 0xBB, 0xBF]);
+        const blob = new Blob([BOM, csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
