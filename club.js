@@ -169,9 +169,47 @@ function escapeHTML(str) {
         .replace(/'/g, '&#39;');
 }
 
+function exportCustomersToExcel() {
+    if (!allCustomers || allCustomers.length === 0) {
+        showNotification("No hay clientes para exportar", "warning");
+        return;
+    }
+
+    try {
+        // Excel/CSV compatible structure: UTF-8 BOM, separator (semi-colon/comma), headers
+        const headers = ["Nombre", "Teléfono"];
+        const rows = allCustomers.map(customer => [
+            customer.nombre || "",
+            customer.telefono || ""
+        ]);
+
+        // Convert rows to CSV, escaping quotes and using semicolon separator
+        const csvContent = [headers, ...rows]
+            .map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(";"))
+            .join("\n");
+
+        // UTF-8 BOM to ensure characters (such as accents or ñ) display correctly in Excel
+        const BOM = "\uFEFF";
+        const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "clientes_club_onemore.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showNotification("Lista de clientes exportada correctamente", "success");
+    } catch (e) {
+        console.error("Error al exportar clientes:", e);
+        showNotification("Error al exportar: " + e.message, "error");
+    }
+}
+
 // Exponer funciones globalmente
 window.loadCustomers = loadCustomers;
 window.filterCustomers = filterCustomers;
 window.editStamps = editStamps;
 window.saveStamps = saveStamps;
 window.closeStampsModal = closeStampsModal;
+window.exportCustomersToExcel = exportCustomersToExcel;
